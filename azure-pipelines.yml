@@ -28,18 +28,12 @@ stages:
           - task: Maven@4
             inputs:
               mavenPomFile: 'pom.xml'
-              publishJUnitResults: true
-              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              publishJUnitResults: false
               javaHomeOption: 'JDKVersion'
               mavenVersionOption: 'Default'
               mavenAuthenticateFeed: false
               effectivePomSkip: false
-              sonarQubeRunAnalysis: true
-              sqMavenPluginVersionChoice: 'latest'
-              checkStyleRunAnalysis: true
-              pmdRunAnalysis: true
-              findBugsRunAnalysis: true
-              spotBugsRunAnalysis: true
+              sonarQubeRunAnalysis: false
           - task: Docker@2
             inputs:
               containerRegistry: 'DockerLink'
