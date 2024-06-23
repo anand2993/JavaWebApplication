@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loginapp-deployment
+  labels:
+    app: loginapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loginapp
+  template:
+    metadata:
+      labels:
+        app: loginapp
+    spec:
+      containers:
+      - name: loginapp
+        image: your-docker-registry/loginapp:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: JDBC_URL
+          valueFrom:
+            secretKeyRef:
+              name: loginapp-secret
+              key: jdbc-url
+        - name: JDBC_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: loginapp-secret
+              key: jdbc-username
+        - name: JDBC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: loginapp-secret
+              key: jdbc-password
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: loginapp-secret
+type: Opaque
+data:
+  jdbc-url: <base64_encoded_jdbc_url>
+  jdbc-username: <base64_encoded_jdbc_username>
+  jdbc-password: <base64_encoded_jdbc_password>
