@@ -25,15 +25,10 @@ stages:
               mvn -version
             displayName: Show maven Version
 
-          - task: Maven@4
+          - task: Maven@3
             inputs:
               mavenPomFile: 'pom.xml'
-              publishJUnitResults: false
-              javaHomeOption: 'JDKVersion'
-              mavenVersionOption: 'Default'
-              mavenAuthenticateFeed: false
-              effectivePomSkip: false
-              sonarQubeRunAnalysis: false
+              goals: 'clean package'
           - task: Docker@2
             inputs:
               containerRegistry: 'DockerLink'
