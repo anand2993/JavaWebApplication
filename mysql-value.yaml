@@ -1,0 +1,4 @@
+mysqlRootPassword: rootpassword
+mysqlUser: myuser
+mysqlPassword: mypassword
+mysqlDatabase: mydatabase

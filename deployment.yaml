@@ -1,47 +1,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: loginapp-deployment
-  labels:
-    app: loginapp
+  name: java-app
+  namespace: my-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: loginapp
+      app: java-app
   template:
     metadata:
       labels:
-        app: loginapp
+        app: java-app
     spec:
       containers:
-      - name: loginapp
-        image: your-docker-registry/loginapp:latest
+      - name: java-app
+        image: <your-java-app-image>
         ports:
         - containerPort: 8080
         env:
         - name: JDBC_URL
-          valueFrom:
-            secretKeyRef:
-              name: loginapp-secret
-              key: jdbc-url
+          value: "jdbc:mysql://my-mysql.my-app.svc.cluster.local:3306/$(MYSQL_DATABASE)"
         - name: JDBC_USERNAME
           valueFrom:
             secretKeyRef:
-              name: loginapp-secret
-              key: jdbc-username
+              name: mysql-secret
+              key: mysql-user
         - name: JDBC_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: loginapp-secret
-              key: jdbc-password
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: loginapp-secret
-type: Opaque
-data:
-  jdbc-url: <base64_encoded_jdbc_url>
-  jdbc-username: <base64_encoded_jdbc_username>
-  jdbc-password: <base64_encoded_jdbc_password>
+              name: mysql-secret
+              key: mysql-password
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-database
