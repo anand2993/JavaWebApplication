@@ -65,7 +65,7 @@ stages:
                helm install my-mysql bitnami/mysql --namespace my-app -f mysql-values.yaml
             displayName: 'Deploy MySQL with Helm'
       - job: DeployJavaApp
-        dependsOn: DeployMySQL
+        dependsOn: deploy
         steps:
          - script: |
              kubectl apply -f deployment.yaml
