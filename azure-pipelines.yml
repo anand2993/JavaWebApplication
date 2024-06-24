@@ -6,6 +6,9 @@
 trigger:
 - main
 
+variables:
+  HELM_VERSION: 'v3.9.4' 
+
 stages:
    - stage: Build
      displayName: Build
@@ -44,3 +47,26 @@ stages:
               repository: 'anand2993/webapp'
               command: 'buildAndPush'
               Dockerfile: '**/Dockerfile'
+
+   - stage: Deploy
+     displayName: Deploy
+     jobs:
+      - job: deploy
+        steps:
+          - task: HelmInstaller@1
+            inputs:
+              helmVersion: $($HELM_VERSION)
+            displayName: "Install Helm on Azure DevOps"
+
+          - script: |
+               kubectl create namespace my-app || true
+               kubectl apply -f mysql-secret.yaml
+               helm repo add bitnami https://charts.bitnami.com/bitnami
+               helm install my-mysql bitnami/mysql --namespace my-app -f mysql-values.yaml
+            displayName: 'Deploy MySQL with Helm'
+      - job: DeployJavaApp
+        dependsOn: DeployMySQL
+        steps:
+         - script: |
+             kubectl apply -f deployment.yaml
+           displayName: 'Deploy Java Application'      
