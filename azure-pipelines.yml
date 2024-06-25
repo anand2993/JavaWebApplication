@@ -18,6 +18,9 @@ stages:
          pool:
             vmImage: ubuntu-latest
          steps:
+          - checkout: self
+            clean: true
+            fetchDepth: 1
           - task: JavaToolInstaller@0
             inputs:
               versionSpec: '17'
@@ -27,7 +30,7 @@ stages:
              echo 'Maven version:'
               mvn -version
             displayName: Show maven Version
-
+          
           - task: Maven@3
             inputs:
               mavenPomFile: 'pom.xml'
@@ -36,10 +39,7 @@ stages:
             inputs:
               Contents: 'target/**'
               TargetFolder: '$(Build.ArtifactStagingDirectory)/target'
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)/target'
-              ArtifactName: 'target'
+
               
           - task: Docker@2
             inputs:
@@ -53,6 +53,7 @@ stages:
      jobs:
       - job: deploy
         steps:
+        
           - task: HelmInstaller@1
             inputs:
               helmVersion: $($HELM_VERSION)
