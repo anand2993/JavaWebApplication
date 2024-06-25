@@ -47,27 +47,29 @@ stages:
               repository: 'anand2993/webapp'
               command: 'buildAndPush'
               Dockerfile: '**/Dockerfile'
+   - stage: InstallDocker
+     jobs:
+      - job: InstallDocker
+        displayName: 'Install Docker Engine'
+        steps:
+         - script: |
+            sudo apt-get update
+            sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+            sudo apt-get update
+            sudo apt-get install -y docker-ce=$(DOCKER_VERSION)
+           displayName: 'Install Docker Engine'
 
    - stage: Deploy
      displayName: Deploy
      jobs:
-      - job: deploy
+      - job: Run
         steps:
-        
-          - task: HelmInstaller@1
-            inputs:
-              helmVersion: $($HELM_VERSION)
-            displayName: "Install Helm on Azure DevOps"
-
-          - script: |
-               kubectl create namespace my-app || true
-               kubectl apply -f mysql-secret.yaml
-               helm repo add bitnami https://charts.bitnami.com/bitnami
-               helm install my-mysql bitnami/mysql --namespace my-app -f mysql-values.yaml
-            displayName: 'Deploy MySQL with Helm'
-      - job: DeployJavaApp
-        dependsOn: deploy
-        steps:
-         - script: |
-             kubectl apply -f deployment.yaml
-           displayName: 'Deploy Java Application'      
+        - task: Docker@2
+          inputs:
+            containerRegistry: 'DockerLink'
+            repository: 'anand2993/webapp'
+            command: 'run'
+            arguments: '-d --name java-app -p 8080:8080'
+      
