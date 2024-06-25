@@ -7,7 +7,7 @@ trigger:
 - main
 
 variables:
-  HELM_VERSION: 'v3.9.4' 
+  - group: Docker-Variables
 
 stages:
    - stage: Build
@@ -93,12 +93,12 @@ stages:
 
               #Pulling the Docker image
               echo "Pulling Docker image"
-              sudo docker pull $(dockerImageName):78
+              sudo docker pull $(dockerImageName):104
 
               #Running the Docker Image
 
               echo "Running Docker container"
-              sudo docker run -d --name $(dockerContainerName)/$(dockerImageName):78
+              sudo docker run -d --name web-app $(dockerImageName):104
 
               #Checking Container status
               sudo docker ps
