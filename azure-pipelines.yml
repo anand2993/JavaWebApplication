@@ -85,10 +85,21 @@ stages:
      jobs:
       - job: Run
         steps:
-        - task: Docker@2
-          inputs:
-            containerRegistry: 'DockerLink'
-            repository: 'anand2993/webapp'
-            command: 'run'
-            arguments: '-d --name java-app -p 8080:8080'
+         - script: |
+            
+              echo "Logging in to Docker registry"
+              sudo docker login -u $(dockerUsername) -p $(dockerPassword)
+              echo "Login Successful"
+
+              #Pulling the Docker image
+              echo "Pulling Docker image"
+              sudo docker pull $(dockerImageName):78
+
+              #Running the Docker Image
+
+              echo "Running Docker container"
+              sudo docker run -d --name $(dockerContainerName)/$(dockerImageName):78
+
+              #Checking Container status
+              sudo docker ps
       
